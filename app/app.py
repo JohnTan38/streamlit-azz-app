@@ -472,14 +472,14 @@ elif dataUpload is not None:
 #st.markdown('''
             #**REBATES** :orange[rebates] :blue-background[blue highlight] :cherry_blossom:''')
 
-            sheetName = 'psa_rebate_'+ datetime.now().strftime("%Y%m%d %H%M")
-            try:
-                    calculate_rebate(add_offpeak_columns(psa_rebate_indicator)).to_csv("C:/Users/"+usr_name[0]+ "/Downloads/"+ 'psa_rebate.csv', mode='x')
-            except FileExistsError:
-                    calculate_rebate(add_offpeak_columns(psa_rebate_indicator)).to_csv("C:/Users/"+usr_name[0]+ "/Downloads/"+ 'psa_rebate_1.csv')
+            #sheetName = 'psa_rebate_'+ datetime.now().strftime("%Y%m%d %H%M")
+            #try:
+                    #calculate_rebate(add_offpeak_columns(psa_rebate_indicator)).to_csv("C:/Users/"+usr_name[0]+ "/Downloads/"+ 'psa_rebate.csv', mode='x')
+            #except FileExistsError:
+                    #calculate_rebate(add_offpeak_columns(psa_rebate_indicator)).to_csv("C:/Users/"+usr_name[0]+ "/Downloads/"+ 'psa_rebate_1.csv')
             
-            usr_email = user_email(usr_name)
-            send_email_psa_reabte(offpeak_rebate_sums(calculate_rebate(add_offpeak_columns(psa_rebate_indicator))),usr_email)
+            #usr_email = user_email(usr_name)
+            #send_email_psa_reabte(offpeak_rebate_sums(calculate_rebate(add_offpeak_columns(psa_rebate_indicator))),usr_email)
 
 
 footer_html = """
