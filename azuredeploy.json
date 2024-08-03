@@ -47,7 +47,7 @@
       },
       "repoUrl": {
         "type": "string",
-        "defaultValue": "https://github.com/JohnTan38/streamlit-azure-app.git",
+        "defaultValue": "https://github.com/JohnTan38/streamlit-azz-app.git",
         "metadata": {
           "description": "Git Repo URL"
         }
