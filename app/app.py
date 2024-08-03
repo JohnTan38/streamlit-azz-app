@@ -325,7 +325,7 @@ elif dataUpload is not None:
                 return df_count
             st.write("20 ft/40 ft offpeak count")
             st.table(count_occurrences(calculate_rebate(add_offpeak_columns(psa_rebate_indicator))))
-            #psa_offpeak_count = count_occurrences(calculate_rebate(add_offpeak_columns(psa_rebate_indicator)))
+            psa_offpeak_count = count_occurrences(calculate_rebate(add_offpeak_columns(psa_rebate_indicator)))
 
             def offpeak_rebate_sums(df_rebate):
                 # Filter rows based on conditions
