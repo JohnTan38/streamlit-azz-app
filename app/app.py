@@ -358,6 +358,7 @@ elif dataUpload is not None:
                                  engine='openpyxl')
             df_psa_lolo = pd.read_excel(r'https://raw.githubusercontent.com/JohnTan38/Project-Income/main/Overall_Rebate_Efficiency.xlsx', sheet_name='PSA_LOLO',
                              engine='openpyxl')
+            df_overall_rebate_efficiency.set_index('Week', inplace=True)
             psa_lolo_20 = df_psa_lolo['psa_lolo_20']
             psa_lolo_40 = df_psa_lolo['psa_lolo_40']
             #sum across cols
@@ -378,7 +379,7 @@ elif dataUpload is not None:
                 df[new_column] = new_week
                 return df
             
-            df_overall_rebate_efficiency_new = add_column(df_overall_rebate_efficiency, overall_rebate_efficiency)
+            df_overall_rebate_efficiency_new = add_column(df_overall_rebate_efficiency.T, overall_rebate_efficiency)
             # Transpose the DataFrame to have weeks as rows
             df_overall_rebate_efficiency_new = df_overall_rebate_efficiency_new.T
             df_overall_rebate_efficiency_new.columns = ['Efficiency']
