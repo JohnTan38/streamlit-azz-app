@@ -104,10 +104,10 @@ elif dataUpload is not None:
         for i in range(len(dataUpload)):
             if dataUpload[i].name in 'Week.xlsx':
                 haulier_original_0 = pd.read_excel(dataUpload[i], sheet_name='Week', engine='openpyxl')
-                haulier_00 = haulier_original_0[['Container Number', 'Size, Type', 'Carrier Name', 'Carrier Voyage', 'Event Type','Event Time']]
+                haulier_00 = haulier_original_0[['ContainerNumber', 'Size,Type', 'CarrierName', 'CarrierVoyage', 'EventType','EventTime']]
 
-                haulier_00.rename(columns = {'Container Number': 'Container_Number', 'Carrier Name': 'Carrier_Name', 'Carrier Voyage': 'Carrier_Voyage', 
-                            'Size, Type': 'Size', 'Event Type': 'Event_Type', 'Event Time': 'Event_Time'}, inplace = True)
+                haulier_00.rename(columns = {'ContainerNumber': 'Container_Number', 'CarrierName': 'Carrier_Name', 'CarrierVoyage': 'Carrier_Voyage', 
+                            'Size,Type': 'Size', 'EventType': 'Event_Type', 'EventTime': 'Event_Time'}, inplace = True)
                 haulier_00.sort_values(['Event_Time', 'Carrier_Name'], ascending=[True, False], inplace=True)
                 haulier_0 = haulier_00.copy()
             elif dataUpload[i].name in 'DCON.xlsx':
