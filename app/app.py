@@ -119,16 +119,32 @@ elif dataUpload is not None:
                     column_mapping = {col: new_col for col in col_to_rename}
                     df_rename_col = df.rename(columns=column_mapping)
                     return df_rename_col
-                dcon_1 = rename_specific_cols(dcon_0.copy(), ['Discharger Abbreviated Vessel', 'Loader Abbreviated Vessel'], 'Carrier_Name')
-                dcon_2 = rename_specific_cols(dcon_1, ['Discharger Abbreviated Voyage', 'Loader Abbreviated Voyage'], 'Carrier_Voyage')
+                #dcon_1 = rename_specific_cols(dcon_0.copy(), ['Discharger Abbreviated Vessel', 'Loader Abbreviated Vessel'], 'Carrier_Name')
+                #dcon_2 = rename_specific_cols(dcon_1, ['Discharger Abbreviated Voyage', 'Loader Abbreviated Voyage'], 'Carrier_Voyage')
 
-                dcon_2.rename(columns={'Container': 'Container_Number', 'Discharger Berthing Time': 'Berth_Time', 'Discharge Time': 'Discharge_Time', 
-                       'Loader Berthing Time': 'Berth_Time', 'Load Time': 'Load_Time'}, inplace=True)
+                dcon_0.rename(columns={'Container': 'Container_Number', 'Discharger Abbreviated Vessel': 'Discharger_Abbr_Vessel', 'Completion of Discharge': 'Complete_Discharge_Time', 'Exit Time': 'Exit_Time', 
+                       'Loader Abbreviated Vessel': 'Loader_Abbr_Vessel', 'Loader Berthing Time': 'Loader_Berth_Time', 'Arrive Time': 'Arrive_Time'}, inplace=True)
                 def format_time(df, col1,col2):
                     df[col1] = df[col1].astype(str).str.replace('-','')
                     df[col2] = df[col2].astype(str).str.replace('-','')
                     return df
-                dcon_3=format_time(dcon_2, 'Discharge_Time', 'Load_Time')
+                dcon_1=format_time(dcon_0, 'Exit_Time', 'Arrive_Time')
+                dcon_2=format_time(dcon_1, 'Complete_Discharge_Time', 'Loader_Berth_Time')
+
+                def populate_none(df):
+                    # Replace empty strings with None in 'Exit_Time' and 'Arrive_Time' columns
+                    df['Exit_Time'] = df['Exit_Time'].apply(lambda x: None if x == '' else x)
+                    df['Arrive_Time'] = df['Arrive_Time'].apply(lambda x: None if x == '' else x)
+                    return df
+
+                def add_event_type_column(df):
+                    # Create a new column 'Event_Type' with default value as None
+                    df['Event_Type'] = 'ARRIVE'    
+    
+                    df.loc[df['Exit_Time'].notna(), 'Event_Type'] = 'EXIT' # Assign 'EXIT' if 'Exit_Time' is not empty   
+                    #df.loc[df['Arrive_Time'].notna() & df['Event_Type'].isna(), 'Event_Type'] = 'ARRIVE' # Assign 'ARRIVE' if 'Arrive_Time' is not empty and 'Event_Type' is still None
+                    return df
+                dcon_3 = add_event_type_column(populate_none(dcon_2))
 
                 def rename_duplicate_columns(df):
                     cols = pd.Series(df.columns)
