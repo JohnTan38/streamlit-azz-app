@@ -442,7 +442,9 @@ elif dataUpload is not None:
                     ax.annotate(str(df_rebate.iloc[i//len(df.columns), i%len(df.columns)]), 
                                (p.get_x() * 1.005, p.get_height() * 1.005))
     
-                plt.ylim(0, 450) # Set the y-axis limit    
+                dynamic_max_value = max(int(df.max().max()), 450)
+                plt.ylim(0, dynamic_max_value + dynamic_max_value*0.15)) # Set the dynamic y-axis limit
+                #plt.ylim(0, 450)     
                 plt.title('Nonpeak - container volume and $rebate', fontsize=9) # Set the title of the plot
                 plt.ylabel('Container volume and $rebate', fontsize=8)
                 plt.xlabel('Container size', fontsize=8)   
