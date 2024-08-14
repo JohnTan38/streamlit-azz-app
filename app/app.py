@@ -360,7 +360,7 @@ elif dataUpload is not None:
 
                 return offpeak_df
             st.write("Offpeak Rebates ($)")
-            st.dataframe(offpeak_rebate_sums(calculate_rebate(add_offpeak_columns(psa_rebate_indicator))))
+            st.dataframe(offpeak_rebate_sums(calculate_rebate(add_offpeak_columns(updates_df_haulier))))
 
             def sum_and_round(df):
                 column_sums = df.sum() #sum all cols
