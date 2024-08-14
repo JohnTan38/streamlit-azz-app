@@ -146,6 +146,27 @@ elif dataUpload is not None:
                     return df
                 dcon_3 = add_event_type_column(populate_none(dcon_2))
 
+                def format_datetime_columns(df, columns, date_format):
+                    for column in columns:
+                            df[column] = pd.to_datetime(df[column], format=date_format)
+                    return df
+
+                def calculate_time_difference(df):
+                    # Calculate Time_Difference based on conditions
+                    df['Time_Difference'] = None
+                    df.loc[df['Exit_Time'].isna(), 'Time_Difference'] = (df['Loader_Berth_Time'] - df['Arrive_Time']).dt.total_seconds() / 60
+                    df.loc[df['Arrive_Time'].isna(), 'Time_Difference'] = (df['Exit_Time'] - df['Complete_Discharge_Time']).dt.total_seconds() / 60
+   
+                    df['PSA_Rebate'] = np.nan # Initialize a new column 'PSA_Rebate' with NaN values
+
+                    # Assign 'PSA_Rebate' based on 'Time_Difference'
+                    df.loc[df['Time_Difference'] < 24*60, 'PSA_Rebate'] = 1
+                    df.loc[(df['Time_Difference'] >= 24*60) & (df['Time_Difference'] < 48*60), 'PSA_Rebate'] = 2
+                    return df
+                psa_rebate_indicator = calculate_time_difference(format_datetime_columns(dcon_3, 
+                                                                         ['Complete_Discharge_Time', 'Exit_Time', 'Loader_Berth_Time', 'Arrive_Time'], '%d%m%Y %H:%M'))
+
+
                 def rename_duplicate_columns(df):
                     cols = pd.Series(df.columns)
                     for dup in cols[cols.duplicated()].unique(): 
