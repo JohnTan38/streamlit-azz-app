@@ -165,56 +165,42 @@ elif dataUpload is not None:
                     return df
                 psa_rebate_indicator = calculate_time_difference(format_datetime_columns(dcon_3, 
                                                                          ['Complete_Discharge_Time', 'Exit_Time', 'Loader_Berth_Time', 'Arrive_Time'], '%d%m%Y %H:%M'))
+                 
 
 
+                def add_psa_rebate(df_hauler, df_psa_rebate):
+                    df_hauler['Event_Time'] = pd.to_datetime(df_hauler['Event_Time']) # Convert to datetime for comparison
+                    df_psa_rebate['Exit_Time'] = pd.to_datetime(df_psa_rebate['Exit_Time'])
+                    df_psa_rebate['Arrive_Time'] = pd.to_datetime(df_psa_rebate['Arrive_Time'])
+    
+                    # Merge df_hauler with df_psa_rebate on 'Container_Number' and 'Event_Type'
+                    df_merged = pd.merge(df_hauler, df_psa_rebate, on=['Container_Number', 'Event_Type'], how='left')
+    
+                    # Function to check if Event_Time matches with Complete_Discharge_Time or Loader_Berth_Time
+                    def rebate(row):
+                        if row['Event_Time'] == row['Exit_Time'] or row['Event_Time'] == row['Arrive_Time']:
+                            return row['PSA_Rebate']
+                        return None
+    
+                    # Apply the function to each row
+                    df_merged['PSA_Rebate'] = df_merged.apply(rebate, axis=1)
+    
+                    # Return the original df_hauler DataFrame with the new 'PSA_Rebate' column
+                    return df_merged[['Container_Number', 'Size', 'Event_Type', 'Event_Time', 'PSA_Rebate']]
+                updates_df_haulier = add_psa_rebate(haulier_0, psa_rebate_indicator)
+    
                 def rename_duplicate_columns(df):
                     cols = pd.Series(df.columns)
                     for dup in cols[cols.duplicated()].unique(): 
                         cols[cols[cols == dup].index.values.tolist()] = [dup + '_' + str(i) if i != 0 else dup for i in range(sum(cols == dup))]
                     df.columns = cols
                     return df
-
-                dcon = rename_duplicate_columns(dcon_3)
-
-        #append 'Discharge_Time', 'Load_Time' to haulier dataframe 20240706 works great!
-        def append_columns_2(df_dcon, df_haulier):
-            # First, merge based on 'Carrier_Name' & 'Carrier_Voyage'
-            df_merged = pd.merge(df_haulier, df_dcon[['Carrier_Name', 'Carrier_Voyage', 'Discharge_Time', 'Load_Time']], 
-                            on=['Carrier_Name', 'Carrier_Voyage'], how='left')
-
-            # Then, merge based on 'Carrier_Name_1' & 'Carrier_Voyage_1'
-            df_merged = pd.merge(df_merged, df_dcon[['Carrier_Name_1', 'Carrier_Voyage_1', 'Discharge_Time', 'Load_Time']], 
-                            left_on=['Carrier_Name', 'Carrier_Voyage'], right_on=['Carrier_Name_1', 'Carrier_Voyage_1'], 
-                            how='left', suffixes=('', '_1'))
-
-            # If 'Discharge_Time' and 'Load_Time' are NaN, fill them with the values from the second merge
-            df_merged['Discharge_Time'].fillna(df_merged['Discharge_Time_1'], inplace=True)
-            df_merged['Load_Time'].fillna(df_merged['Load_Time_1'], inplace=True)
-            # Drop the unnecessary columns
-            df_merged.drop(columns=['Carrier_Name_1', 'Carrier_Voyage_1', 'Discharge_Time_1', 'Load_Time_1'], inplace=True)
-            return df_merged
-        
-        def calculate_time_difference(df):
-            df['Event_Time'] = pd.to_datetime(df['Event_Time']) # Convert the time columns to datetime
-            df['Discharge_Time'] = pd.to_datetime(df['Discharge_Time'])
-            df['Load_Time'] = pd.to_datetime(df['Load_Time'])
-
-            df['Time_Difference'] = np.nan # Initialize a new column 'Time_Difference' with NaN values
-
-            # Calculate 'Time_Difference' for rows where 'Event_Type' is 'EXIT'
-            df.loc[df['Event_Type'] == 'EXIT', 'Time_Difference'] = (df['Event_Time'] - df['Discharge_Time']).dt.total_seconds() / 60
-
-            # Calculate 'Time_Difference' for rows where 'Event_Type' is 'ENTRY'
-            df.loc[df['Event_Type'] == 'ENTRY', 'Time_Difference'] = (df['Load_Time'] - df['Event_Time']).dt.total_seconds() / 60
+                from datetime import datetime
+                    
+             
+       
     
-            df['PSA_Rebate'] = np.nan # Initialize a new column 'PSA_Rebate' with NaN values
-
-            # Assign 'PSA_Rebate' based on 'Time_Difference'
-            df.loc[df['Time_Difference'] < 24*60, 'PSA_Rebate'] = 1
-            df.loc[(df['Time_Difference'] >= 24*60) & (df['Time_Difference'] < 48*60), 'PSA_Rebate'] = 2
-
-            return df
-
+      
         #def send_email_psa_reabte(df,usr_email):
             #usr_email = user_email(usr_name)
             #email_receiver = usr_email
@@ -277,12 +263,10 @@ elif dataUpload is not None:
         if st.button('Lets get rebates'):
             #st.dataframe(data_new)
             st.divider()
-            psa_rebate_indicator = calculate_time_difference(append_columns_2(dcon,haulier_0).dropna(subset=['Container_Number']))
+            #psa_rebate_indicator = calculate_time_difference(append_columns_2(dcon,haulier_0).dropna(subset=['Container_Number']))
             #rebate = data_new.copy()
             from datetime import datetime
-
-            #public_holidays = ['2024-01-01', '2024-02-10', '2024-02-11', '2024-05-01', '2024-05-23', '2024-05-24', '2024-08-09', 
-                   #'2024-10-25', '2024-12-25'] 
+            
             df_public_holidays = pd.read_excel("https://raw.githubusercontent.com/JohnTan38/Project-Income/main/public_holidays.xlsx", sheet_name='public_holidays', 
                                                 engine='openpyxl')
             public_holidays = df_public_holidays['public_holidays'].tolist() # Define the public holidays in Singapore
@@ -303,10 +287,10 @@ elif dataUpload is not None:
                     # Check if the event time is a Sunday, a public holiday, or between 21:00 and 04:59
                     if row['Event_Time'].weekday() == 6 or row['Event_Time'].strftime('%Y-%m-%d') in public_holidays or (row['Event_Time'].hour >= 21 or row['Event_Time'].hour < 5):
                         # If 'PSA_Rebate' is 1, set 'Offpeak_24' to 1
-                        if row['PSA_Rebate'] == 1:
+                        if row['PSA_Rebate'] == 1.0:
                             df_rebate.at[i, 'Offpeak_24'] = 1
                         # If 'PSA_Rebate' is 2, set 'Offpeak_48' to 1
-                        elif row['PSA_Rebate'] == 2:
+                        elif row['PSA_Rebate'] == 2.0:
                             df_rebate.at[i, 'Offpeak_48'] = 1
     
                 extract_numeric(df_rebate)
@@ -347,7 +331,7 @@ elif dataUpload is not None:
                 # Apply the function to each row in the DataFrame to calculate the rebate
                 df['Rebate'] = df.apply(rebate, axis=1)
                 return df
-            st.dataframe(calculate_rebate(add_offpeak_columns(psa_rebate_indicator)))
+            st.dataframe(calculate_rebate(add_offpeak_columns(updates_df_haulier)))
             st.divider()
 
             def count_occurrences(df_rebate):
