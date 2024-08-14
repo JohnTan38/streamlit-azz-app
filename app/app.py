@@ -112,7 +112,7 @@ elif dataUpload is not None:
                 haulier_0 = haulier_00.copy()
             elif dataUpload[i].name in 'DCON.xlsx':
                 dcon_original = pd.read_excel(dataUpload[i], sheet_name='DCON', engine='openpyxl')
-                dcon_0 = dcon_original[['Container', 'Discharger Abbreviated Vessel', 'Discharger Abbreviated Voyage', 'Discharger Berthing Time', 'Discharge Time', 
+                dcon_0 = dcon_original[['Container', 'Discharger Abbreviated Vessel', 'Discharger Abbreviated Voyage', 'Completion of Discharge', 'Exit Time', 
                         'Loader Abbreviated Vessel', 'Loader Abbreviated Voyage', 'Loader Berthing Time', 'Arrive Time']]
                 def rename_specific_cols(df, col_to_rename, new_col):
     
