@@ -195,12 +195,8 @@ elif dataUpload is not None:
                         cols[cols[cols == dup].index.values.tolist()] = [dup + '_' + str(i) if i != 0 else dup for i in range(sum(cols == dup))]
                     df.columns = cols
                     return df
-                from datetime import datetime
-                    
-             
-       
-    
-      
+                from datetime import datetime    
+                 
         #def send_email_psa_reabte(df,usr_email):
             #usr_email = user_email(usr_name)
             #email_receiver = usr_email
@@ -263,6 +259,7 @@ elif dataUpload is not None:
         if st.button('Lets get rebates'):
             #st.dataframe(data_new)
             st.divider()
+            updates_df_haulier = add_psa_rebate(haulier_0, psa_rebate_indicator)
             #psa_rebate_indicator = calculate_time_difference(append_columns_2(dcon,haulier_0).dropna(subset=['Container_Number']))
             #rebate = data_new.copy()
             from datetime import datetime
@@ -345,8 +342,8 @@ elif dataUpload is not None:
 
                 return df_count
             st.write("20 ft/40 ft offpeak count")
-            st.table(count_occurrences(calculate_rebate(add_offpeak_columns(psa_rebate_indicator))))
-            psa_offpeak_count = count_occurrences(calculate_rebate(add_offpeak_columns(psa_rebate_indicator)))
+            st.table(count_occurrences(calculate_rebate(add_offpeak_columns(updates_df_haulier))))
+            psa_offpeak_count = count_occurrences(calculate_rebate(add_offpeak_columns(updates_df-haulier)))
 
             def offpeak_rebate_sums(df_rebate):
                 # Filter rows based on conditions
@@ -370,9 +367,9 @@ elif dataUpload is not None:
                 rounded_sums = column_sums.round(1)
                 return rounded_sums
 
-            sums = sum_and_round(offpeak_rebate_sums(calculate_rebate(add_offpeak_columns(psa_rebate_indicator))))
+            sums = sum_and_round(offpeak_rebate_sums(calculate_rebate(add_offpeak_columns(updates_df_haulier))))
             #st.write(f"total_offpeak_rebate_24hr: {sums['offpeak_24hr']}") #st.write(f"total_offpeak_rebate_48hr: {sums['offpeak_48hr']}")
-            df_offpeak_rebate_sums = offpeak_rebate_sums(calculate_rebate(add_offpeak_columns(psa_rebate_indicator)))
+            df_offpeak_rebate_sums = offpeak_rebate_sums(calculate_rebate(add_offpeak_columns(updates_df_haulier)))
             
             #20240801
             df_overall_rebate_efficiency = pd.read_excel(r'https://raw.githubusercontent.com/JohnTan38/Project-Income/main/Overall_Rebate_Efficiency.xlsx', sheet_name='OverallRebateEfficiency', 
@@ -445,7 +442,7 @@ elif dataUpload is not None:
                     ax.annotate(str(df_rebate.iloc[i//len(df.columns), i%len(df.columns)]), 
                                (p.get_x() * 1.005, p.get_height() * 1.005))
     
-                plt.ylim(0, 100) # Set the y-axis limit    
+                plt.ylim(0, 450) # Set the y-axis limit    
                 plt.title('Nonpeak - container volume and $rebate', fontsize=9) # Set the title of the plot
                 plt.ylabel('Container volume and $rebate', fontsize=8)
                 plt.xlabel('Container size', fontsize=8)   
