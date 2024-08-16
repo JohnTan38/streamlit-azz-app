@@ -396,8 +396,22 @@ elif dataUpload is not None:
                 new_column = 'Week_'+ str(last_week_number+1)
                 df[new_column] = new_week
                 return df
+
+            import datetime
+            today_date = datetime.datetime.today().strftime('%Y-%m-%d) #format as str
+            date = datetime.datetime.strptime(today_date, '%Y-%m-%d)
+            week_num = date.isocalendar()[1] #get week num of current date
+
+            def get_week_number(df_rebate_efficiency):
+                last_week_label = df_rebate_efficiency['Week'].iloc[-1] #get the last week label
+                week_number = int(last_week_label.split('_')[-1])
+                return week_number
+            if week_num != get_week_number(df_overall_rebate_efficiency.reset_index()):
+                df_overall_rebate_efficiency_new = add_column(df_overall_rebate_efficiency.T, overall_rebate_efficiency)
+            else:
+                df_overall_rebate_efficiency_new = df_overall_rebate_efficiency.T
             
-            df_overall_rebate_efficiency_new = add_column(df_overall_rebate_efficiency.T, overall_rebate_efficiency)
+            #df_overall_rebate_efficiency_new = add_column(df_overall_rebate_efficiency.T, overall_rebate_efficiency) #original code
             # Transpose the DataFrame to have weeks as rows
             df_overall_rebate_efficiency_new = df_overall_rebate_efficiency_new.T
             df_overall_rebate_efficiency_new.columns = ['Efficiency']
