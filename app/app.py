@@ -134,7 +134,7 @@ elif dataUpload is not None:
                     df[col1] = df[col1].astype(str).str.replace('-','')
                     df[col2] = df[col2].astype(str).str.replace('-','')
                     return df
-                dcon_1=format_time(dcon_0, 'Exit_Time', 'Arrive_Time')
+                dcon_1=format_time(dcon_jit, 'Exit_Time', 'Arrive_Time')
                 dcon_2=format_time(dcon_1, 'Complete_Discharge_Time', 'Loader_Berth_Time')
 
                 def populate_none(df):
@@ -192,7 +192,7 @@ elif dataUpload is not None:
                     df_merged['PSA_Rebate'] = df_merged.apply(rebate, axis=1)
     
                     # Return the original df_hauler DataFrame with the new 'PSA_Rebate' column
-                    return df_merged[['Container_Number', 'Size', 'Event_Type', 'Event_Time', 'PSA_Rebate']]
+                    return df_merged[['Container_Number', 'Size', 'Event_Type', 'Event_Time', 'PSA_Rebate', 'JIT']]
                 updates_df_haulier = add_psa_rebate(haulier_0, psa_rebate_indicator)
     
                 def rename_duplicate_columns(df):
