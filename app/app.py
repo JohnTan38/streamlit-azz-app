@@ -104,7 +104,7 @@ elif dataUpload is not None:
         for i in range(len(dataUpload)):
             if dataUpload[i].name in 'Week.xlsx':
                 haulier_original_0 = pd.read_excel(dataUpload[i], sheet_name='Week', engine='openpyxl')
-                haulier_00 = haulier_original_0[['ContainerNumber', 'Size,Type', 'CarrierName', 'CarrierVoyage', 'EventType','EventTime']]
+                haulier_00 = haulier_original_0[['ContainerNumber', 'Size,Type', 'CarrierName', 'CarrierVoyage', 'EventType','EventTime', 'PSALOLO']]
 
                 haulier_00.rename(columns = {'ContainerNumber': 'Container_Number', 'CarrierName': 'Carrier_Name', 'CarrierVoyage': 'Carrier_Voyage', 
                             'Size,Type': 'Size', 'EventType': 'Event_Type', 'EventTime': 'Event_Time'}, inplace = True)
@@ -113,7 +113,7 @@ elif dataUpload is not None:
             elif dataUpload[i].name in 'DCON.xlsx':
                 dcon_original = pd.read_excel(dataUpload[i], sheet_name='DCON', engine='openpyxl')
                 dcon_0 = dcon_original[['Container', 'Discharger Abbreviated Vessel', 'Discharger Abbreviated Voyage', 'Completion of Discharge', 'Exit Time', 
-                        'Loader Abbreviated Vessel', 'Loader Abbreviated Voyage', 'Loader Berthing Time', 'Arrive Time']]
+                        'Loader Abbreviated Vessel', 'Loader Abbreviated Voyage', 'Loader Berthing Time', 'Arrive Time', 'Arrive Details']]
                 def rename_specific_cols(df, col_to_rename, new_col):
     
                     column_mapping = {col: new_col for col in col_to_rename}
@@ -124,6 +124,12 @@ elif dataUpload is not None:
 
                 dcon_0.rename(columns={'Container': 'Container_Number', 'Discharger Abbreviated Vessel': 'Discharger_Abbr_Vessel', 'Completion of Discharge': 'Complete_Discharge_Time', 'Exit Time': 'Exit_Time', 
                        'Loader Abbreviated Vessel': 'Loader_Abbr_Vessel', 'Loader Berthing Time': 'Loader_Berth_Time', 'Arrive Time': 'Arrive_Time'}, inplace=True)
+
+                def add_jit_column(df):
+                     df['JIT'] = df['Arrive Details'].apply(lambda x: 'JIT' if 'VIA JIT' in x else " ")
+                     return df[['Container_Number', 'Discharger_Abbr_Vessel', 'Complete_Discharge_Time', 'Exit_Time', 'Loader_Abbr_Vessel', 'Loader_Berth_Time', 
+                               'Arrive_Time', 'JIT']]
+                dcon_jit = add_jit_column(decon_0)
                 def format_time(df, col1,col2):
                     df[col1] = df[col1].astype(str).str.replace('-','')
                     df[col2] = df[col2].astype(str).str.replace('-','')
