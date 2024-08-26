@@ -129,7 +129,7 @@ elif dataUpload is not None:
                      df['JIT'] = df['Arrive Details'].apply(lambda x: 'JIT' if 'VIA JIT' in x else " ")
                      return df[['Container_Number', 'Discharger_Abbr_Vessel', 'Complete_Discharge_Time', 'Exit_Time', 'Loader_Abbr_Vessel', 'Loader_Berth_Time', 
                                'Arrive_Time', 'JIT']]
-                dcon_jit = add_jit_column(decon_0)
+                dcon_jit = add_jit_column(dcon_0)
                 def format_time(df, col1,col2):
                     df[col1] = df[col1].astype(str).str.replace('-','')
                     df[col2] = df[col2].astype(str).str.replace('-','')
