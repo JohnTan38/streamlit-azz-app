@@ -377,14 +377,26 @@ elif dataUpload is not None:
             #st.write(f"total_offpeak_rebate_24hr: {sums['offpeak_24hr']}") #st.write(f"total_offpeak_rebate_48hr: {sums['offpeak_48hr']}")
             df_offpeak_rebate_sums = offpeak_rebate_sums(calculate_rebate(add_offpeak_columns(updates_df_haulier)))
             
-            #20240801
+            #20240801 20240825
+            def compute_psa_lolo(df_psa):
+                df_psa['PSALOLO'] = df_psa['PSALOLO'].fillna(0)
+                df_psa['PSALOLO'] = df_psa['PSALOLO'].astype(float)
+                df_psa['Size'] = df_psa['Size'].str.extract('(\d+)').astype(int)
+                
+                psa_lolo_20 = df_psa[df_psa['Size'] == 20]['PSALOLO'].sum() # Sum all rows of 'PSALOLO' where 'Size' == 20
+                psa_lolo_40 = df_psa[df_psa['Size'] == 40]['PSALOLO'].sum() # Sum all rows of 'PSALOLO' where 'Size' == 40
+                # Create a new DataFrame with the results
+                df_psa_lolo = pd.DataFrame({'PSALOLO': [psa_lolo_20, psa_lolo_40]}, index=[20, 40]) # Create new DataFrame with results
+                return df_psa_lolo
+                 
             df_overall_rebate_efficiency = pd.read_excel(r'https://raw.githubusercontent.com/JohnTan38/Project-Income/main/Overall_Rebate_Efficiency.xlsx', sheet_name='OverallRebateEfficiency', 
                                  engine='openpyxl')
             df_psa_lolo = pd.read_excel(r'https://raw.githubusercontent.com/JohnTan38/Project-Income/main/Overall_Rebate_Efficiency.xlsx', sheet_name='PSA_LOLO',
                              engine='openpyxl')
             df_overall_rebate_efficiency.set_index('Week', inplace=True)
-            psa_lolo_20 = df_psa_lolo['psa_lolo_20']
-            psa_lolo_40 = df_psa_lolo['psa_lolo_40']
+            df_psa_lolo = compute_psa_lolo(haulier_0)
+            psa_lolo_20 = df_psa_lolo['PSALOLO'][20]
+            psa_lolo_40 = df_psa_lolo['PSALOLO'][40]
             #sum across cols
             def sum_cols(df, col_sum):
                 df[col_sum] = df.sum(axis=1)
