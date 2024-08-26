@@ -193,7 +193,7 @@ elif dataUpload is not None:
     
                     # Return the original df_hauler DataFrame with the new 'PSA_Rebate' column
                     return df_merged[['Container_Number', 'Size', 'Event_Type', 'Event_Time', 'PSA_Rebate', 'JIT']]
-                updates_df_haulier = add_psa_rebate(haulier_0, psa_rebate_indicator)
+                #updates_df_haulier = add_psa_rebate(haulier_0, psa_rebate_indicator)
     
                 def rename_duplicate_columns(df):
                     cols = pd.Series(df.columns)
